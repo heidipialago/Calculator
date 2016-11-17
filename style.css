@@ -1,0 +1,93 @@
+main {
+    width: 600px;
+    margin: 0 auto;
+    padding: 1em;
+}
+table
+{
+    width: 25%;
+    border-collapse: collapse;
+    border: 5px solid black;
+}
+table, tr, td {
+	background-color: gray;
+    
+    text-align: center;
+}
+td#output
+{
+	background-color: black;
+}
+.numberbutton
+{
+    padding: 15px 32px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    display: inline-block;
+    border: none;
+    margin: 2px 2px;
+    background-color: orange;
+    text-align: center;
+    border-radius: 8px;
+    border: 2px solid black;
+}
+.numberbutton1
+{
+    width: 150px;
+    padding: 15px 32px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    display: inline-block;
+    border: none;
+    margin: 2px 2px;
+    background-color: #FA7D00;
+    border-radius: 8px;
+    border: 2px solid black;
+}
+.operationbutton
+{
+	padding: 15px 32px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    display: inline-block;
+    border: none;
+    margin: 2px 2px;
+    background-color: orange;
+    text-align: center;
+    border-radius: 8px;
+    border: 2px solid black;
+}
+.clearbutton
+{
+	width: 250px;
+	padding: 15px 32px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    display: inline-block;
+    border: none;
+    margin: 2px 2px;
+    background-color: orange;
+    text-align: center;
+    border-radius: 8px;
+    border: 2px solid black;
+}
+.output
+{
+	background-color: black;
+	font-weight: bold;
+	font-size: 2em;
+	color: orange;
+	text-align: right;
+	font-family: "Courier New", "Times New Roman";
+}
+p#label
+{
+	font-family: "Courier New", Tahoma, Arial;
+	font-weight: bold;
+	font-size: 1.2em;
+	text-align: left;
+}

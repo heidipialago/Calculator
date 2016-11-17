@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html ng-app>
+<head>
+        <title>HPP Calculator</title>
+		<link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+
+<!--start of script for functions and variables-->
+<script type='text/javascript'>
+//<![CDATA[			
+
+/* Angular controller that handles calculations and bindings*/
+function myController($scope) {
+
+    // output display
+    $scope.output = "0";
+
+    // tells if going to start a new number in the display or to concatenate
+    $scope.newNumber = true;
+
+    // carries pending operation so calculator knows what to do
+    $scope.pendingOperation = null;
+
+    // To view in display a token indicating the current operation
+    $scope.operationToken = "";
+
+    // Holds the running total as numbers are added/subtracted
+    $scope.runningTotal = null;
+
+    // Holds the number value of the string in the display output
+    $scope.pendingValue = null;
+
+    // Tells calculator what to do when the equals buttons is clicked repeatedly
+    $scope.lastOperation = null;
+
+    // Constant variables
+    var ADD = "adding";
+    var SUBTRACT = "subtracting";
+    var MULTIPLY = "multiplying";
+    var DIVIDE = "dividing";
+    var ADD_TOKEN = "+";
+    var SUBTRACT_TOKEN = "-";
+    var MULTIPLY_TOKEN = "*";
+    var DIVIDE_TOKEN = "/";
+
+    /* Function for the number buttons, updates the output display and sets newNumber flag */
+    $scope.updateOutput = function (btn) {
+        if ($scope.output == "0" || $scope.newNumber) {
+            $scope.output = btn;
+            $scope.newNumber = false;
+        } else {
+            $scope.output += String(btn);
+        }
+        $scope.pendingValue = toNumber($scope.output);
+    };
+
+    /* Addition function */
+    $scope.add = function () {
+        if ($scope.pendingValue) {
+            if ($scope.runningTotal && $scope.pendingOperation == ADD) {
+                $scope.runningTotal += $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == SUBTRACT) {
+                $scope.runningTotal -= $scope.pendingValue;
+            } else {
+                $scope.runningTotal = $scope.pendingValue;
+            }
+        }
+        setOperationToken(ADD);
+        setOutput(String($scope.runningTotal));
+        $scope.pendingOperation = ADD;
+        $scope.newNumber = true;
+        $scope.pendingValue = null;
+    };
+
+    /* Subtraction function */
+    $scope.subtract = function () {
+        if ($scope.pendingValue) {
+            if ($scope.runningTotal && ($scope.pendingOperation == SUBTRACT)) {
+                $scope.runningTotal -= $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == ADD) {
+                $scope.runningTotal += $scope.pendingValue;
+            } else {
+                $scope.runningTotal = $scope.pendingValue;
+            }
+        }
+        setOperationToken(SUBTRACT);
+        setOutput(String($scope.runningTotal));
+        $scope.pendingOperation = SUBTRACT;
+        $scope.newNumber = true;
+        $scope.pendingValue = null;
+    };
+    
+    /* Multiplication function */
+    $scope.multiply = function () {
+    	if ($scope.pendingValue) {
+            if ($scope.runningTotal && ($scope.pendingOperation == MULTIPLY)) {
+                $scope.runningTotal *= $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == DIVIDE) {
+                $scope.runningTotal /= $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == ADD) {
+                $scope.runningTotal += $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == SUBTRACT) {
+                $scope.runningTotal -= $scope.pendingValue;
+            } else {
+                $scope.runningTotal = $scope.pendingValue;
+            }
+        }
+        setOperationToken(MULTIPLY);
+        setOutput(String($scope.runningTotal));
+        $scope.pendingOperation = MULTIPLY;
+        $scope.newNumber = true;
+        $scope.pendingValue = null;
+    };
+    
+    /* Division function */
+    $scope.divide = function () {
+    	if ($scope.pendingValue) {
+            if ($scope.runningTotal && ($scope.pendingOperation == DIVIDE)) {
+                $scope.runningTotal /= $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == MULTIPLY) {
+                $scope.runningTotal *= $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == ADD) {
+                $scope.runningTotal += $scope.pendingValue;
+            } else if ($scope.runningTotal && $scope.pendingOperation == SUBTRACT) {
+                $scope.runningTotal -= $scope.pendingValue;
+            } else {
+                $scope.runningTotal = $scope.pendingValue;
+            }
+        }
+        setOperationToken(DIVIDE);
+        setOutput(String($scope.runningTotal));
+        $scope.pendingOperation = DIVIDE;
+        $scope.newNumber = true;
+        $scope.pendingValue = null;
+    };
+
+    /* Equals or Total Function that calculates the numbers according to operation selected */
+    $scope.calculate = function () {
+        if (!$scope.newNumber) {
+            $scope.pendingValue = toNumber($scope.output);
+            $scope.lastValue = $scope.pendingValue;
+        }
+        if ($scope.pendingOperation == ADD) {
+            $scope.runningTotal += $scope.pendingValue;
+            $scope.lastOperation = ADD;
+        } else if ($scope.pendingOperation == SUBTRACT) {
+            $scope.runningTotal -= $scope.pendingValue;
+            $scope.lastOperation = SUBTRACT;
+        } else if ($scope.pendingOperation == MULTIPLY) {
+            $scope.runningTotal *= $scope.pendingValue;
+            $scope.lastOperation = MULTIPLY;
+        } else if ($scope.pendingOperation == DIVIDE) {
+            $scope.runningTotal /= $scope.pendingValue;
+            $scope.lastOperation = DIVIDE;
+        } else {
+            if ($scope.lastOperation) {
+                if ($scope.lastOperation == ADD) {
+                    if ($scope.runningTotal) {
+                        $scope.runningTotal += $scope.lastValue;
+                    } else {
+                        $scope.runningTotal = 0;
+                    }
+                } else if ($scope.lastOperation == SUBTRACT) {
+                    if ($scope.runningTotal) {
+                        $scope.runningTotal -= $scope.lastValue;
+                    } else {
+                        $scope.runningTotal = 0;
+                    }
+                } else if ($scope.lastOperation == MULTIPLY) {
+                    if ($scope.runningTotal) {
+                        $scope.runningTotal *= $scope.lastValue;
+                    } else {
+                        $scope.runningTotal = 0;
+                    }
+                } else if ($scope.lastOperation == DIVIDE) {
+                    if ($scope.runningTotal) {
+                        $scope.runningTotal /= $scope.lastValue;
+                    } else {
+                        $scope.runningTotal = 0;
+                    }
+                }
+            } else {
+                $scope.runningTotal = 0;
+            }
+        }
+        setOutput($scope.runningTotal);
+        setOperationToken();
+        $scope.pendingOperation = null;
+        $scope.pendingValue = null;
+    };
+
+    /* Clear button */
+    $scope.clear = function () {
+        $scope.runningTotal = null;
+        $scope.pendingValue = null;
+        $scope.pendingOperation = null;
+        setOutput("0");
+    };
+
+    /* Updates the display output and resets the newNumber flag */
+    setOutput = function (outputString) {
+        $scope.output = outputString;
+        $scope.newNumber = true;
+    };
+
+    /* Sets the operation token to let the user know what the pendingOperation is */
+    setOperationToken = function (operation) {
+        if (operation == ADD) {
+            $scope.operationToken = ADD_TOKEN;
+        } else if (operation == SUBTRACT) {
+            $scope.operationToken = SUBTRACT_TOKEN;
+        } else if (operation == MULTIPLY) {
+            $scope.operationToken = MULTIPLY_TOKEN;
+        } else if (operation == DIVIDE) {
+            $scope.operationToken = DIVIDE_TOKEN;
+        } else {
+            $scope.operationToken = "";
+        }
+    };
+
+    /* Converts a string to a number so calculator can perform calculations */
+    toNumber = function (numberString) {
+        var result = 0;
+        if (numberString) {
+            result = numberString * 1;
+        }
+        return result;
+    };
+
+}
+//]]> 
+
+</script><!--end of script-->
+</head><!--end of head-->
+<body><!--start of body-->
+    <div ng-controller="myController">
+    		<table>
+			<tr><!--label-->
+				<td colspan="4"><p id="label">&nbsp;HPP</p></td>
+			</tr><!--end label-->
+			<tr><!--display area-->
+				<td id="output" colspan="4"><p class="output" name="output">{{output}}
+    			<br>{{operationToken}}<br></p>
+				</td>
+			</tr><!--end display area-->
+			<tr><!--input buttons area-->
+				<td colspan="3"><button name="btnclear" class="clearbutton" value="C" ng-click='clear()'>C L E A R</td>
+				<td><button name="btndivide" class="operationbutton" value="/" ng-click='divide()'>/</td>
+			</tr>
+			<tr>
+				<td><button name="btnseven" class="numberbutton" value="7"  ng-click='updateOutput(7)'>7</td>
+				<td><button name="btneight" class="numberbutton" value="8"  ng-click='updateOutput(8)'>8</td>
+				<td><button name="btnnine" class="numberbutton" value="9"  ng-click='updateOutput(9)'>9</td>
+				<td><button name="btnmultiply" class="operationbutton" value="*" ng-click='multiply()'>*</td>
+			</tr>
+			<tr>
+				<td><button name="btnfour" class="numberbutton" value="4"  ng-click='updateOutput(4)'>4</td>
+				<td><button name="btnfive" class="numberbutton" value="5"  ng-click='updateOutput(5)'>5</td>
+				<td><button name="btnsix" class="numberbutton" value="6"  ng-click='updateOutput(6)'>6</td>
+				<td><button name="btnsubtract" class="operationbutton" value="-" ng-click='subtract()'>-</td>
+			</tr>
+			<tr>
+				<td><button name="btnone" class="numberbutton" value="1"  ng-click='updateOutput(1)'>1</td>
+				<td><button name="btntwo" class="numberbutton" value="2"  ng-click='updateOutput(2)'>2</td>
+				<td><button name="btnthree" class="numberbutton" value="3"  ng-click='updateOutput(3)'>3</td>
+				<td><button name="btnadd" class="operationbutton" value="+" ng-click='add()'>+</td>
+			</tr>
+			<tr>
+				<td><button name="btnzero" class="numberbutton" value="0"  ng-click='updateOutput(0)'>0</td>
+				<td colspan="3"><button name="btnequals" class="numberbutton1" value="=" ng-click='calculate()'>=</td>
+			</tr><!--end input buttons area-->
+		</table>
+    </div>
+</body>
+</html>
+
